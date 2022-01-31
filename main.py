@@ -1,3 +1,4 @@
+from turtle import hideturtle
 from pytube import Playlist
 import os 
 import subprocess
@@ -24,6 +25,8 @@ class PlayList:
 
     def setSongStart(self, amt:int):
         self.songStart = amt
+
+    
 
     def download(self):
         path, dirs, files = next(os.walk("songs"))
@@ -104,5 +107,8 @@ def init():
         player.setLoopTrue()
     own_start = int(input(f"Do you have any specific index you want to start at? : (1-{player.songAmount+1} or if undefined 0) : "))-1
     player.setSongStart(own_start)
+    hideTerminal = input("Do you want to hide the terminal? (y/n) : ")
+    if (hideTerminal == "y"):
+        player.SetHideTerminal()
 
 main()
