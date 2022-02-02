@@ -1,4 +1,3 @@
-from turtle import hideturtle
 from pytube import Playlist
 import os 
 import subprocess
@@ -8,7 +7,7 @@ import ctypes
 
 class PlayList:
     def __init__(self, playList) -> None:
-        self.playList = playList
+        self.playList = Playlist(playList)
         self.songAmount = 0
         self.loop = False
         self.shuffle = False
@@ -26,17 +25,15 @@ class PlayList:
     def setSongStart(self, amt:int):
         self.songStart = amt
 
-    
-
     def download(self):
         path, dirs, files = next(os.walk("songs"))
         file_count = len(files)
 
         print('Number of videos in playlist: %s' % len(self.playList.video_urls))
         
-        if (file_count < self.songAmount):
+        if file_count < self.songAmount:
             count = file_count - 1
-            if (file_count == 0):
+            if file_count == 0:
                 count = 0
             print(file_count, count)
             for video in self.playList.videos:
@@ -66,7 +63,7 @@ class PlayList:
             user32.ShowWindow(hWnd, SW_HIDE)
 
 
-        if (self.songStart != -1):
+        if self.songStart != -1:
             playsound(f"{folder}/{self.songStart}.wav")
 
         if self.shuffle:
