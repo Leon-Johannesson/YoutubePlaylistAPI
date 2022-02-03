@@ -95,7 +95,7 @@ def main():
     player.play_songs()
 
 def init():
-    player.setSongAmount(player.playList.video_urls)
+    player.setSongAmount(len(player.playList.video_urls))
     shuffle = input("Do you want to shuffle? (y/n) : ")
     if shuffle == "y":
         player.setShuffleTrue()
