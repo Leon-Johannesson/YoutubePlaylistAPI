@@ -1,9 +1,11 @@
+from concurrent.futures import thread
 from pytube import Playlist
 import os 
 import subprocess
 from random import randint
 from playsound import playsound
 import ctypes
+
 
 class PlayList:
     def __init__(self, playList) -> None:
@@ -12,7 +14,7 @@ class PlayList:
         self.loop = False
         self.shuffle = False
         self.songStart = 0
-
+        self.hideTerminal = False
     def setSongAmount(self, amt:int):
         self.songAmount = amt
 
@@ -24,6 +26,9 @@ class PlayList:
 
     def setSongStart(self, amt:int):
         self.songStart = amt
+
+    def SetHideTerminal(self):
+        self.hideTerminal = True
 
     def download(self):
         path, dirs, files = next(os.walk("songs"))
@@ -51,16 +56,16 @@ class PlayList:
 
     def play_songs(self):
         folder = "songs"
+        if self.hideTerminal:
+            #hiding the cmd window
+            kernel32 = ctypes.WinDLL('kernel32')
+            user32 = ctypes.WinDLL('user32')
 
-        #hiding the cmd window
-        kernel32 = ctypes.WinDLL('kernel32')
-        user32 = ctypes.WinDLL('user32')
+            SW_HIDE = 0
 
-        SW_HIDE = 0
-
-        hWnd = kernel32.GetConsoleWindow()
-        if hWnd:
-            user32.ShowWindow(hWnd, SW_HIDE)
+            hWnd = kernel32.GetConsoleWindow()
+            if hWnd:
+                user32.ShowWindow(hWnd, SW_HIDE)
 
 
         if self.songStart != -1:
@@ -95,7 +100,7 @@ def main():
     player.play_songs()
 
 def init():
-    player.setSongAmount(len(player.playList.video_urls))
+    player.setSongAmount(len(player.playList.video_urls))   
     shuffle = input("Do you want to shuffle? (y/n) : ")
     if shuffle == "y":
         player.setShuffleTrue()
@@ -107,5 +112,6 @@ def init():
     hideTerminal = input("Do you want to hide the terminal? (y/n) : ")
     if (hideTerminal == "y"):
         player.SetHideTerminal()
+
 
 main()
