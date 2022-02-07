@@ -1,11 +1,10 @@
-from concurrent.futures import thread
 from pytube import Playlist
 import os 
 import subprocess
 from random import randint
-from playsound import playsound
 import ctypes
-
+from pydub import AudioSegment 
+from pydub.playback import play 
 
 class PlayList:
     def __init__(self, playList) -> None:
@@ -15,6 +14,8 @@ class PlayList:
         self.shuffle = False
         self.songStart = 0
         self.hideTerminal = False
+        self.volume = 5
+
     def setSongAmount(self, amt:int):
         self.songAmount = amt
 
@@ -53,9 +54,12 @@ class PlayList:
                     print("Converting MP3 to WAV file... ")
                     os.remove(f'songs/{count}.mp3')
                     count += 1
+                    with open ("songs/url.txt", "x", encoding="utf-8") as f:
+                        f.write(self.playList)
 
     def play_songs(self):
         folder = "songs"
+        
         if self.hideTerminal:
             #hiding the cmd window
             kernel32 = ctypes.WinDLL('kernel32')
@@ -66,31 +70,33 @@ class PlayList:
             hWnd = kernel32.GetConsoleWindow()
             if hWnd:
                 user32.ShowWindow(hWnd, SW_HIDE)
-
-
+                
         if self.songStart != -1:
-            playsound(f"{folder}/{self.songStart}.wav")
+            self.playCurrentSong(folder, self.songStart)
 
         if self.shuffle:
             if self.loop:
                 while True:
-                    playsound(f"{folder}/{randint(0, self.songAmount)}.wav")
+                    self.playCurrentSong(folder, randint(0, self.songAmount))
             else:
                 played_songs = []
                 while len(played_songs) != self.songAmount:
                     index = randint(0, self.songAmount)
                     if index not in played_songs:
-                        playsound(f"{folder}/{index}.wav")
-                        played_songs.append(index)
+                        self.playCurrentSong(folder, index)
         elif self.loop:
             while True:
                 for i in range(len(self.playList.videos)):
-                    playsound(f"{folder}/{i}.wav")
+                    self.playCurrentSong(folder, i)
         else:
             for i in range(len(self.playList.videos)):
-                    playsound(f"{folder}/{i}.wav")
+                    self.playCurrentSong(folder, i)
 
-
+    def playCurrentSong(self, folder, index):
+        wav_file = AudioSegment.from_file(file = f"{folder}/{index}.wav", 
+                                  format = "wav")
+        wav_file = wav_file - self.volume
+        play(wav_file)
 
 player = PlayList("https://www.youtube.com/playlist?list=PLZ6lVRBHR4RnWDzx-PKbMuLXiAM5xbzPR")
 
