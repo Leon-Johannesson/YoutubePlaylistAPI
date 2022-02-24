@@ -6,9 +6,9 @@ import ctypes
 from pydub import AudioSegment 
 from pydub.playback import play 
 
-class PlayList:
-    def __init__(self, playList) -> None:
-        self.playList = Playlist(playList)
+class SongManager:
+    def __init__(self, currentPlaylist) -> None:
+        self.currentPlaylist = Playlist(currentPlaylist)
         self.songAmount = 0
         self.loop = False
         self.shuffle = False
@@ -35,14 +35,14 @@ class PlayList:
         path, dirs, files = next(os.walk("songs"))
         file_count = len(files)
 
-        print('Number of videos in playlist: %s' % len(self.playList.video_urls))
+        print('Number of videos in playlist: %s' % len(self.currentPlaylist.video_urls))
         
         if file_count < self.songAmount:
             count = file_count - 1
             if file_count == 0:
                 count = 0
             print(file_count, count)
-            for video in self.playList.videos:
+            for video in self.currentPlaylist.videos:
                 if file_count < count or file_count == 0:
                     print("Downloading song file...")
                     v = video.streams.filter(only_audio=True).all()
@@ -55,9 +55,9 @@ class PlayList:
                     os.remove(f'songs/{count}.mp3')
                     count += 1
                     with open ("songs/url.txt", "x", encoding="utf-8") as f:
-                        f.write(self.playList)
+                        f.write(self.currentPlaylist)
 
-    def play_songs(self):
+    def playSongs(self):
         folder = "songs"
         
         if self.hideTerminal:
@@ -86,10 +86,10 @@ class PlayList:
                         self.playCurrentSong(folder, index)
         elif self.loop:
             while True:
-                for i in range(len(self.playList.videos)):
+                for i in range(len(self.currentPlaylist.videos)):
                     self.playCurrentSong(folder, i)
         else:
-            for i in range(len(self.playList.videos)):
+            for i in range(len(self.currentPlaylist	.videos)):
                     self.playCurrentSong(folder, i)
 
     def playCurrentSong(self, folder, index):
@@ -98,15 +98,15 @@ class PlayList:
         wav_file = wav_file - self.volume
         play(wav_file)
 
-player = PlayList("https://www.youtube.com/playlist?list=PLZ6lVRBHR4RnWDzx-PKbMuLXiAM5xbzPR")
+player = SongManager("https://www.youtube.com/playlist?list=PLZ6lVRBHR4RnWDzx-PKbMuLXiAM5xbzPR")
 
 def main():
     init()
     player.download()
-    player.play_songs()
+    player.playSongs()
 
 def init():
-    player.setSongAmount(len(player.playList.video_urls))   
+    player.setSongAmount(len(player.currentPlaylist.video_urls))   
     shuffle = input("Do you want to shuffle? (y/n) : ")
     if shuffle == "y":
         player.setShuffleTrue()
